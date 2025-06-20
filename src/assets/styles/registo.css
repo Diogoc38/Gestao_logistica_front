@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;1,900&display=swap');
+
+.register-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #3270AE, #152E48);
+    padding: 1rem;
+}
+
+.register-card {
+    background: #15304A;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    width: 31.25rem; /* aumentado */
+    max-width: 95vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    text-align: center;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+}
+
+input {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to right, #16304B, #3471B1);
+    color: white;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.875rem;
+}
+
+button {
+    margin-top: 1.5rem;
+    padding: 0.75rem;
+    font-weight: bold;
+    font-style: italic;
+    background-color: #3270AD;
+    border: none;
+    color: white;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.9375rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.form-row input {
+    flex: 1;
+}
