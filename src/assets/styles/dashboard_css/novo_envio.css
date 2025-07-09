@@ -291,4 +291,21 @@ small {
     background-color: #199b2f;
 }
 
+.recolha-lista {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.item-recolha {
+    cursor: pointer;
+    padding: 0.3rem 0;
+    transition: background 0.2s;
+}
+
+.item-recolha:hover {
+    background-color: #e0e0e0;
+}
 

@@ -8,6 +8,7 @@ import Perfil from '../views/Perfil.vue';
 import { useAuthStore } from '@/store/auth';
 import MinhasEncomendas from '../views/MinhasEncomendas.vue';
 import HistoricoEncomendas from "@/views/HistoricoEncomendas.vue";
+import TicketsAbertos from '@/views/Dashboard/TicketsAbertos.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -16,7 +17,9 @@ const routes = [
   {path: '/minhas-encomendas', name: 'MinhasEncomendas', component: MinhasEncomendas},
   { path: '/historico-encomendas', name: 'HistoricoEncomendas', component: HistoricoEncomendas, meta: { requiresAuth: true } },
   { path: '/perfil', name: 'Perfil', component: Perfil, meta: { requiresAuth: true } },
-  {
+  {path: '/tickets', name: 'TicketsCliente', component: () => import('@/views/TicketsCliente.vue'), meta: { requiresAuth: true }},
+
+{
     path: '/dashboard',
     component: Dashboard,
     meta: { requiresAuth: true },
@@ -30,7 +33,8 @@ const routes = [
       {path: 'turno', name: 'Turno', component: () => import('@/views/Dashboard/Turno.vue'), meta: { requiresAuth: true }},
       { path: 'turno-ativo', name: 'TurnoAtivo', component: () => import('@/views/Dashboard/TurnoAtivo.vue'), meta: { requiresAuth: true }},
       { path: 'turnos-encerrados', name: 'TurnosEncerrados', component: () => import('@/views/Dashboard/TurnosEncerrados.vue'), meta: { requiresAuth: true }},
-      {path: 'clientes/:id/editar', name: 'EditarCliente', component: () => import('@/views/Dashboard/EditarCliente.vue')
+      { path: 'tickets/abertos', name: 'TicketsAbertos', component: TicketsAbertos },
+      {path: 'clientes/:id/editar', name: 'EditarCliente', component: () => import('@/views/Dashboard/EditarCliente.vue'),
       }
 
     ]

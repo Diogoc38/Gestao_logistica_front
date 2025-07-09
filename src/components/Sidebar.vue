@@ -81,8 +81,20 @@
         </router-link>
       </ul>
 
-      <li><i class="fas fa-euro-sign"></i><span v-if="!collapsed">Reembolsos</span></li>
-      <li><i class="fas fa-file-invoice-dollar"></i><span v-if="!collapsed">Faturação</span></li>
+      <!-- Título clicável: Faturação -->
+      <li @click="toggleSection('faturacao')">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span v-if="!collapsed">Faturação</span>
+        <i v-if="!collapsed" class="fas fa-chevron-down submenu-arrow"></i>
+      </li>
+
+      <!-- Submenu: Reembolsos -->
+      <ul v-if="!collapsed && expandedSection === 'faturacao'" class="submenu">
+        <router-link to="/dashboard/reembolsos" custom v-slot="{ navigate, isActive }">
+          <li :class="{ 'active': isActive }" @click="navigate">Reembolsos</li>
+        </router-link>
+      </ul>
+
       <router-link to="/dashboard/clientes" custom v-slot="{ navigate, isActive }">
         <li :class="{ 'active': isActive }" @click="navigate">
           <i class="fas fa-users"></i>
@@ -90,16 +102,21 @@
         </li>
       </router-link>
 
-      <li><i class="fas fa-truck"></i><span v-if="!collapsed">Frota</span></li>
-
-
-      <li><i class="fas fa-envelope"></i><span v-if="!collapsed">Mensagens</span></li>
+      <router-link to="/dashboard/tickets/abertos"custom v-slot="{ navigate, isActive }">
+        <li :class="{ 'active': isActive }" @click="navigate">
+          <i class="fas fas fa-envelope"></i>
+          <span v-if="!collapsed">Mensagens</span>
+        </li>
+      </router-link>
     </ul>
 
     <ul class="menu bottom">
       <li><i class="fas fa-cog"></i><span v-if="!collapsed">Settings</span></li>
       <li><i class="fas fa-question-circle"></i><span v-if="!collapsed">Help</span></li>
-      <li class="logout"><i class="fas fa-sign-out-alt"></i><span v-if="!collapsed">Logout Account</span></li>
+      <li @click="logout" class="logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span v-if="!collapsed">Logout Account</span>
+      </li>
     </ul>
   </aside>
 </template>
@@ -107,10 +124,17 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useAuthStore } from '@/store/auth';
+import { useRouter } from 'vue-router';
 
 const collapsed = ref(false);
 const expandedSection = ref(null);
 const auth = useAuthStore();
+const router = useRouter();
+
+const logout = () => {
+  auth.logout();
+  router.push('/login');
+};
 
 function toggleSection(section) {
   expandedSection.value = expandedSection.value === section ? null : section;

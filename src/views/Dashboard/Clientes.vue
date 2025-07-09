@@ -7,6 +7,7 @@
         <th>Nome</th>
         <th>Email</th>
         <th>Telefone</th>
+        <th>Role</th>
         <th v-if="auth.utilizador?.id_role === 1">Editar</th>
       </tr>
       </thead>
@@ -15,6 +16,7 @@
         <td>{{ cliente.nome_utilizador }} {{ cliente.apelido_utilizador }}</td>
         <td>{{ cliente.email_utilizador }}</td>
         <td>{{ cliente.contacto_utilizador }}</td>
+        <td>{{ cliente.nome_role }}</td>
         <td v-if="auth.utilizador?.id_role === 1">
           <button @click="abrirPerfil(cliente.id_utilizador)">Editar</button>
         </td>

@@ -1,23 +1,65 @@
+/* navbar principal */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.625rem;
-    background-color: #15304A;
+    background-color: #0e2c47;
+    padding: 10px 20px;
+    color: white;
 }
 
+/* logotipo */
 .logo {
     cursor: pointer;
 }
 
+/* zona esquerda da navbar */
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+/* links do cliente (palavras clicáveis) */
+.nav-links-user {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links-user a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    position: relative;
+    padding: 4px 0;
+}
+
+.nav-links-user a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    bottom: -2px;
+    left: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.2s ease-out;
+}
+
+.nav-links-user a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* zona dos links normais */
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.5rem; /* adicionado para espaçar os links */
+    gap: 1.5rem;
 }
 
-/* se estiveres a usar <router-link>, este seletor pode não aplicar:
-   usa .nav-links a em vez de router-link diretamente */
 .nav-links a {
     text-decoration: none;
     color: #ccc;
@@ -25,9 +67,10 @@
 }
 
 .nav-links a:hover {
-    color: white;
+    color: grey;
 }
 
+/* avatar e perfil */
 .profile-container {
     position: relative;
 }
@@ -81,3 +124,19 @@
 .profile-menu button:hover {
     background-color: #255a7a;
 }
+.profile-details p {
+    color: #000; /* preto para alta visibilidade */
+    font-weight: 500;
+    margin: 0.5rem 0;
+}
+
+a.update-profile {
+    color: black; /* azul forte e visível */
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.update-profile:hover {
+    text-decoration: underline;
+}
+

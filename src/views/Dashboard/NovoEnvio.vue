@@ -47,6 +47,20 @@
             />
           </div>
           <small class="texto-ajuda">Assinalar se for Recolha</small>
+          <div v-if="envio.recolha" class="recolha-lista">
+            <div v-if="mensagemRecolha">{{ mensagemRecolha }}</div>
+            <ul v-else>
+              <li
+                  v-for="r in recolhasPendentes"
+                  :key="r.id_recolha"
+                  @click="aplicarRecolha(r)"
+                  class="item-recolha"
+              >
+                {{ r.nome_cliente }} — {{ r.morada_cliente }} ({{ r.designacao_mercadoria }})
+              </li>
+            </ul>
+          </div>
+
         </div>
 
         <!-- Esporádico -->
@@ -280,6 +294,7 @@ const envio = ref({
   valor_reembolso: null,
   enviar_info_email: false,
   email_recetor: '',
+  id_recolha:null,
   id_armazem: null,
   id_tipo_encomenda: 1
 })
@@ -291,6 +306,9 @@ const armazens = ref([])
 const mostrarLista = ref(false)
 const termoPesquisa = ref('')
 const listaRef = ref(null)
+const recolhasPendentes = ref([]);
+const recolhaSelecionada = ref(null);
+const mensagemRecolha = ref('');
 
 onMounted(async () => {
   const token = authStore.token
@@ -319,6 +337,39 @@ const carregarUtilizadores = async () => {
   utilizadores.value = res.data
 }
 
+const carregarRecolhasPendentes = async () => {
+  try {
+    const token = authStore.token;
+    const res = await axios.get('http://localhost:3000/api/recolhas/pendentes', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    recolhasPendentes.value = res.data;
+    if (!res.data.length) {
+      mensagemRecolha.value = 'Não existem recolhas pendentes no momento.';
+    } else {
+      mensagemRecolha.value = '';
+    }
+  } catch (err) {
+    console.error('Erro ao carregar recolhas:', err);
+    mensagemRecolha.value = 'Erro ao carregar recolhas.';
+  }
+};
+
+
+const selecionarRecolha = (recolha) => {
+  recolhaSelecionada.value = recolha;
+  envio.value.id_recolha = recolha.id_recolha;
+  envio.value.nome_receptor = recolha.nome_cliente;
+  envio.value.niff_receptor = recolha.nif_cliente;
+  envio.value.morada_destinatario = recolha.morada_cliente;
+  envio.value.peso = recolha.peso;
+  envio.value.volume = recolha.volume;
+  envio.value.tipo_embalagem = recolha.tipo_embalagem;
+  envio.value.designacao_mercadoria = recolha.designacao_mercadoria;
+  envio.value.observacoes = recolha.observacoes;
+};
+
+
 const selecionarUtilizador = (u) => {
   envio.value.nome_receptor = u.nome_utilizador + ' ' + u.apelido_utilizador
   envio.value.niff_receptor = u.documento_identificacao
@@ -340,10 +391,15 @@ const cancelar = () => window.history.back()
 const submeterEnvio = async () => {
   try {
     const token = authStore.token
-    const payload = { ...envio.value }
+    const payload = {
+      ...envio.value,
+      id_recolha: envio.value.id_recolha ?? null
+    };
 
     if (!payload.designacao_mercadoria) delete payload.designacao_mercadoria
     if (!payload.tipo_embalagem) delete payload.tipo_embalagem
+
+    payload.peso = parseFloat(payload.peso.toString().replace(',', '.'));
 
     await axios.post('http://localhost:3000/api/encomendas', payload, {
       headers: { Authorization: `Bearer ${token}` }
@@ -391,6 +447,11 @@ const confirmarEnvio = async (tipo) => {
 
     await submeterEnvio();
 
+    if (envio.value.id_recolha) {
+      await marcarRecolhaAssociada(envio.value.id_recolha);
+      await carregarRecolhasPendentes();
+    }
+
     if (tipo === 'etiqueta') {
       alert('Encomenda criada e etiqueta impressa.');
     } else if (tipo === 'guia') {
@@ -437,21 +498,55 @@ watch(() => envio.value.peso, async (novoPeso) => {
 
 const atualizarTipoEncomenda = () => {
   if (envio.value.recolha) {
-    envio.value.esporadico = false
-    envio.value.reembolso = false
-    envio.value.id_tipo_encomenda = 4
+    envio.value.esporadico = false;
+    envio.value.reembolso = false;
+    envio.value.id_tipo_encomenda = 4;
+    carregarRecolhasPendentes();
   } else if (envio.value.esporadico) {
-    envio.value.recolha = false
-    envio.value.reembolso = false
-    envio.value.id_tipo_encomenda = 2
+    envio.value.recolha = false;
+    envio.value.reembolso = false;
+    envio.value.id_tipo_encomenda = 2;
   } else if (envio.value.reembolso) {
-    envio.value.recolha = false
-    envio.value.esporadico = false
-    envio.value.id_tipo_encomenda = 3
+    envio.value.recolha = false;
+    envio.value.esporadico = false;
+    envio.value.id_tipo_encomenda = 3;
   } else {
-    envio.value.id_tipo_encomenda = 1
+    envio.value.id_tipo_encomenda = 1;
   }
-}
+};
+
+const marcarRecolhaAssociada = async (id_recolha) => {
+  const token = authStore.token;
+  try {
+    await axios.patch(`http://localhost:3000/api/recolhas/${id_recolha}/associar`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  } catch (err) {
+    console.error('Erro ao marcar recolha como associada:', err.response?.data || err);
+    alert('Erro ao marcar recolha como associada: ' + (err.response?.data?.erro || err.message));
+  }
+};
+
+
+
+
+const aplicarRecolha = async (recolha) => {
+  envio.value.id_recolha = recolha.id_recolha;
+  envio.value.nome_receptor = recolha.nome_destinatario;
+  envio.value.niff_receptor = recolha.nif_destinatario;
+  envio.value.morada_destinatario = recolha.morada_destinatario;
+  envio.value.peso = recolha.peso;
+  envio.value.volume = recolha.volume;
+  envio.value.tipo_embalagem = recolha.tipo_embalagem;
+  envio.value.designacao_mercadoria = recolha.designacao_mercadoria;
+  envio.value.observacoes = recolha.observacoes;
+  envio.value.email_recetor = recolha.email_cliente;
+  recolhaSelecionada.value = recolha;
+};
+
+
+
+
 
 
 </script>

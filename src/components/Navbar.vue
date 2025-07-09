@@ -1,18 +1,25 @@
-<style src="@/assets/styles/navbar.css"></style>
-
 <template>
   <nav class="navbar">
-    <div class="logo" @click="router.push('/')">
-      <strong>GestãoLogística</strong>
+    <div class="navbar-left">
+      <div class="logo" @click="router.push('/')">
+        <strong>GestãoLogística</strong>
+      </div>
+
+      <div v-if="isLoggedIn" class="nav-links-user">
+        <router-link to="/minhas-encomendas">Minhas encomendas</router-link>
+        <router-link to="/historico-encomendas">Histórico de encomendas</router-link>
+        <router-link to="/tickets">Tickets</router-link>
+        <router-link v-if="isAdminOrFuncionario" to="/dashboard">Dashboard</router-link>
+      </div>
+
     </div>
 
     <div class="nav-links">
       <router-link v-if="!isLoggedIn" to="/login">Login</router-link>
       <router-link v-if="!isLoggedIn" to="/registo">Registo</router-link>
-      <router-link v-if="isAdminOrFuncionario" to="/painel">Painel</router-link>
 
       <div v-if="isLoggedIn" class="profile-container">
-        <div class="profile-icon" @click="toggleProfileMenu">
+        <div class="profile-icon" @click.stop="toggleProfileMenu">
           <img v-if="userProfile?.avatar" :src="userProfile.avatar" alt="Profile" class="profile-img" />
           <div v-else class="profile-img-placeholder">{{ userInitials }}</div>
         </div>
@@ -40,6 +47,22 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/store/auth';
+import { onMounted, onBeforeUnmount } from 'vue';
+
+const handleClickOutside = (event) => {
+  const profile = document.querySelector('.profile-container');
+  if (profile && !profile.contains(event.target)) {
+    profileMenuOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -55,8 +78,8 @@ const userInitials = computed(() => {
 });
 
 const isAdminOrFuncionario = computed(() => {
-  const role = auth.utilizador?.role;
-  return role === 'admin' || role === 'funcionario';
+  const role = auth.utilizador?.id_role;
+  return role === 1 || role === 2;
 });
 
 const profileMenuOpen = ref(false);
@@ -69,3 +92,5 @@ const logout = () => {
   router.push('/login');
 };
 </script>
+
+<style src="@/assets/styles/navbar.css"></style>
